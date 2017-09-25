@@ -1,12 +1,12 @@
-package com.xt.daka.youtu
+package com.xt.daka.network.youtu
 
 import com.xt.daka.util.encrypt.Base64Util
 import com.xt.daka.util.encrypt.HMACSHA1
 import java.util.*
 
 /**
- * Created by steve on 17-9-16.
- */
+* Created by steve on 17-9-16.
+*/
 
 
 /**

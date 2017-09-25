@@ -17,8 +17,6 @@
 package com.xt.daka.ui.face;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -44,20 +42,23 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.xt.daka.R;
+import com.xt.daka.base.ImmerseActivity;
+import com.xt.daka.network.youtu.data.model.CompareResult;
 import com.xt.daka.util.sensor.TrackerWrapper;
 import com.xt.daka.widget.AutoFitTextureView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,7 +69,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -76,15 +76,17 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 
-public class FaceActivity extends AppCompatActivity
-        implements View.OnClickListener {
+import static com.xt.daka.util.io.IoKt.createFile;
+import static com.xt.daka.util.io.IoKt.writeTo;
+
+public class FaceActivity extends ImmerseActivity implements FaceContract.View {
+
+    private FaceContract.Presenter mPresenter;
 
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
-    private static final String FRAGMENT_DIALOG = "dialog";
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -92,11 +94,6 @@ public class FaceActivity extends AppCompatActivity
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
-
-    /**
-     * Tag for the {@link Log}.
-     */
-    private static final String TAG = "Camera2BasicFragment";
 
     /**
      * Camera state: Showing camera preview.
@@ -197,6 +194,7 @@ public class FaceActivity extends AppCompatActivity
             mCameraOpenCloseLock.release();
             mCameraDevice = cameraDevice;
             createCameraPreviewSession();
+
         }
 
         @Override
@@ -233,7 +231,6 @@ public class FaceActivity extends AppCompatActivity
     /**
      * This is the output file for our picture.
      */
-    private File mFile;
 
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
@@ -410,71 +407,60 @@ public class FaceActivity extends AppCompatActivity
         }
     }
 
-    boolean allow = true;
+    private boolean allow = true;
+    private Semaphore semaphore  = new Semaphore(1);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_camera2_basic);
-        findViewById(R.id.picture).setOnClickListener(this);
-        findViewById(R.id.info).setOnClickListener(this);
-        mTextureView = (AutoFitTextureView) findViewById(R.id.texture);
+        setContentView(R.layout.activity_face);
 
-        startBackgroundThread();
+        getWindow().setEnterTransition(new Fade(Fade.IN).setDuration(1000));
+        getWindow().setExitTransition(new Fade(Fade.OUT).setDuration(1000));
+
+        EventBus.getDefault().register(this);
+        mPresenter = new FacePresenter(this);
+        mTextureView = findViewById(R.id.texture);
+
+
         if (mTextureView.isAvailable()) {
             openCamera(mTextureView.getWidth(), mTextureView.getHeight());
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
 
+    }
 
-        mFile = new File(getExternalFilesDir(null), "pic.jpg");
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startBackgroundThread();
+        tracker = new TrackerWrapper.StableTracker(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopBackgroundThread();
+        tracker.unregister();
 
     }
+
+    TrackerWrapper.StableTracker tracker;
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-
-        TrackerWrapper.StableTracker tracker = new TrackerWrapper.StableTracker(this);
-        tracker.register();
-        tracker.addStateChangedListnere(new Function1<TrackerWrapper, Unit>() {
-            @Override
-            public Unit invoke(TrackerWrapper trackerWrapper) {
-                trackerWrapper.onStable(new Function0<Unit>() {
-                    @Override
-                    public Unit invoke() {
-
-                        if(allow) {
-                            takePicture();
-                            allow = false;
-                        }
-                        return null;
-                    }
-                });
-                return null;
-            }
-        });
     }
 
-    //    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//
-//        // When the screen is turned off and turned back on, the SurfaceTexture is already
-//        // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-//        // a camera and start preview from here (otherwise, we wait until the surface is ready in
-//        // the SurfaceTextureListener).
-//    }
-////
-////    @Override
-////    public void onPause() {
-////        closeCamera();
-////        stopBackgroundThread();
-////        super.onPause();
-////    }
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        closeCamera();
+        EventBus.getDefault().unregister(this);
+        mPresenter.unsubscribe();
+        allow = false;
+    }
 
     /**
      * Sets up member variables related to camera.
@@ -491,7 +477,7 @@ public class FaceActivity extends AppCompatActivity
 
                 // We don't use a front facing camera in this sample.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
                     continue;
                 }
 
@@ -585,7 +571,6 @@ public class FaceActivity extends AppCompatActivity
         }
     }
 
-
     @SuppressLint("MissingPermission")
     private void openCamera(int width, int height) {
 
@@ -597,11 +582,51 @@ public class FaceActivity extends AppCompatActivity
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
             manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
         }
+    }
+
+    private void initTracker(){
+//
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(allow) {
+                    try {
+                        semaphore.acquire();
+                        takePicture();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+//        if (allow) {
+//            takePicture();
+//            allow = false;
+//        }
+//        tracker.register();
+//        tracker.addStateChangedListnere(new Function1<TrackerWrapper, Unit>() {
+//            @Override
+//            public Unit invoke(TrackerWrapper trackerWrapper) {
+//                trackerWrapper.onStable(new Function0<Unit>() {
+//                    @Override
+//                    public Unit invoke() {
+//
+//                        if (allow) {
+//                            takePicture();
+//                            allow = false;
+//                        }
+//                        return null;
+//                    }
+//                });
+//                return null;
+//            }
+//        });
     }
 
     /**
@@ -695,15 +720,18 @@ public class FaceActivity extends AppCompatActivity
                                 mPreviewRequest = mPreviewRequestBuilder.build();
                                 mCaptureSession.setRepeatingRequest(mPreviewRequest,
                                         mCaptureCallback, mBackgroundHandler);
+
+                                initTracker();
                             } catch (CameraAccessException e) {
                                 e.printStackTrace();
                             }
+
+
                         }
 
                         @Override
                         public void onConfigureFailed(
                                 @NonNull CameraCaptureSession cameraCaptureSession) {
-                            showToast("Failed");
                         }
                     }, null
             );
@@ -864,16 +892,6 @@ public class FaceActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.picture: {
-                takePicture();
-                break;
-            }
-        }
-    }
-
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
         if (mFlashSupported) {
             requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
@@ -881,94 +899,67 @@ public class FaceActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Saves a JPEG {@link Image} into the specified {@link File}.
-     */
+    @Override
+    public void identifySuccess(@NotNull CompareResult result) {
+        allow = false;
+        showToast(String.valueOf(result.component1()));
+    }
 
-    private TreeSet<byte[]> byteBuffer = new TreeSet<>(new Comparator<byte[]>() {
-        @Override
-        public int compare(byte[] bytes, byte[] t1) {
-            return bytes.length - t1.length;
-        }
-    });
+    @Override
+    public void identifyFailed(@NotNull Exception msg) {
 
-    private class ImageSaver implements Runnable {
+        semaphore.release();
+        showToast(msg.getMessage());
+    }
 
-        private final Image mImage;
-        private File mFile;
+    private static class ImageSaver implements Runnable {
+
+        private Image mImage;
+        private static final File mFile = new File(Environment.getExternalStorageDirectory().getPath() + "/result.jpg");
 
         public ImageSaver(Image image) {
-            mImage = image;
-            mFile = new File(Environment.getExternalStorageDirectory().getPath() + "/result.jpg");
-        }
 
+            mImage = image;
+
+        }
         @Override
         public void run() {
+            createFile(mFile);
+            ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+            mImage.close();
 
-            if(!mFile.exists()) try {
-                mFile.createNewFile();
+            try {
+                FileOutputStream output = new FileOutputStream(mFile);
+                output.write(bytes);
+                output.close();
+                EventBus.getDefault().post(mFile.getPath());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-
-            if (byteBuffer.size() <= 2) {
-
-//                if(!mFile.exists()) try {
-//                    mFile.createNewFile();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-//                byte[] bytes = new byte[buffer.remaining()];
-//                buffer.get(bytes);
-//                FileOutputStream output = null;
-//                try {
-//                    output = new FileOutputStream(mFile);
-//                    output.write(bytes);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    mImage.close();
-//                    if (null != output) {
-//                        try {
-//                            output.close();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-                ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-                byte[] bytes = new byte[buffer.remaining()];
-                buffer.get(bytes);
-                byteBuffer.add(bytes);
+            } finally {
                 mImage.close();
 
-                allow = true;
-
-            } else if (byteBuffer.size() == 3 ) {
-                try {
-
-                    FileOutputStream output = new FileOutputStream(mFile);
-                    output.write(byteBuffer.first());
-                    output.close();
-                    Log.e("TAm","Complete");
-                    byteBuffer.add(new byte[5] );
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    mImage.close();
-                    allow = true;
-                }
             }
 
             mImage.close();
-            allow = true;
         }
 
     }
 
-    public void reset() {
-        byteBuffer.clear();
+    @Subscribe
+    public void getPhotoPath(final String path) {
+
+        getAlbumPicker().selectedPicAndHandle(new Function1<String, Unit>() {
+            @Override
+            public Unit invoke(final String s) {
+
+                mPresenter.identify(path, s);
+
+                return null;
+            }
+        });
+
     }
 
 

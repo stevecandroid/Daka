@@ -56,7 +56,7 @@ class PhotoTaker private constructor(private var act: UtilActivity) {
                 if (Build.VERSION.SDK_INT < 24) {
                     imageUri = Uri.fromFile(outputImage)
                 } else {
-                    imageUri = FileProvider.getUriForFile(act, "com.data.xt.daka.fileprovider", outputImage)
+                    imageUri = FileProvider.getUriForFile(act, "com.xt.daka.fileprovider", outputImage)
                 }
                 // 启动相机程序
                 val intent = Intent("android.media.action.IMAGE_CAPTURE")
