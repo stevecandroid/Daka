@@ -43,7 +43,6 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.transition.Fade;
-import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -51,7 +50,7 @@ import android.view.TextureView;
 import android.widget.Toast;
 
 import com.xt.daka.R;
-import com.xt.daka.base.ImmerseActivity;
+import com.xt.daka.base.BaseActivity;
 import com.xt.daka.network.youtu.data.model.CompareResult;
 import com.xt.daka.util.sensor.TrackerWrapper;
 import com.xt.daka.widget.AutoFitTextureView;
@@ -73,15 +72,16 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 
+import static com.xt.daka.util.helper.ActivityUIKt.transparentStatusBar;
 import static com.xt.daka.util.io.IoKt.createFile;
 import static com.xt.daka.util.io.IoKt.writeTo;
 
-public class FaceActivity extends ImmerseActivity implements FaceContract.View {
+public class FaceActivity extends BaseActivity implements FaceContract.View {
 
     private FaceContract.Presenter mPresenter;
+
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -414,6 +414,8 @@ public class FaceActivity extends ImmerseActivity implements FaceContract.View {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face);
+
+        transparentStatusBar(this);
 
         getWindow().setEnterTransition(new Fade(Fade.IN).setDuration(1000));
         getWindow().setExitTransition(new Fade(Fade.OUT).setDuration(1000));

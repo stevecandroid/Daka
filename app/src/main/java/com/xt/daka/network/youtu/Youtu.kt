@@ -1,5 +1,6 @@
 package com.xt.daka.network.youtu
 
+import android.graphics.BitmapFactory
 import com.data.xt.daka.constant.Constant
 import com.data.xt.daka.util.pic.bitmap.BitmapUtil
 import com.xt.daka.network.RetrofitClient
@@ -25,6 +26,20 @@ class Youtu {
 
             val bitmap1 = BitmapUtil.getOptimalBitmap(path1)
             val bitmap2 = BitmapUtil.getOptimalBitmap(path2)
+
+            val byteBitmap1 = BitmapUtil.bitmapToBase64(bitmap1)
+            val byteBitmap2 = BitmapUtil.bitmapToBase64(bitmap2)
+
+            val body = CompareBody(byteBitmap1, byteBitmap2)
+            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
+                    .compare(createYoutuSign(), body)
+
+        }
+
+        fun compareWithoutCompress(path1:String,path2:String) : Observable<Response<CompareResult>> {
+
+            val bitmap1 = BitmapFactory.decodeFile(path1)
+            val bitmap2 = BitmapFactory.decodeFile(path2)
 
             val byteBitmap1 = BitmapUtil.bitmapToBase64(bitmap1)
             val byteBitmap2 = BitmapUtil.bitmapToBase64(bitmap2)

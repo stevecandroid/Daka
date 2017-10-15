@@ -12,9 +12,10 @@ import com.data.xt.daka.UtilActivity
 
 open class BaseActivity : UtilActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
         permissionMgr.request {
-            super.onCreate(savedInstanceState)
-            permissions(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET)
+            permissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET)
         }
     }
 }

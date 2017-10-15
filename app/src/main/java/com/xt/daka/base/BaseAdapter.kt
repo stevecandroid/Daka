@@ -1,25 +1,21 @@
 package com.xt.daka.base
 
 import android.content.Context
-import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import com.xt.daka.util.autoNotify
-import java.util.*
+import com.xt.daka.util.helper.autoNotify
 import kotlin.properties.Delegates
 
 /**
  * Created by steve on 17-9-21.
  */
+
 abstract class  BaseAdapter<T, V :  BaseItemView<T>>() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var mDatas : List<T> by Delegates.observable( mutableListOf() ){
         property, oldValue, newValue ->
-
         autoNotify(oldValue,newValue){ t1 , t2 ->  false }
-
     }
 
     constructor( mDatas : List<T>) : this(){

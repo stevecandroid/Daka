@@ -1,6 +1,7 @@
 package com.xt.daka.ui.main
 
 import android.os.Bundle
+import android.transition.Slide
 import android.util.Log
 import android.widget.Toast
 import com.baidu.location.BDAbstractLocationListener
@@ -28,6 +29,8 @@ class MainActivity : BaseActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        initAnimation()
 
         mLocationClient.registerLocationListener(object : BDAbstractLocationListener() {
             override fun onReceiveLocation(location: BDLocation?) {
@@ -90,6 +93,11 @@ class MainActivity : BaseActivity(){
 
 
         client.locOption = option
+    }
+
+    fun initAnimation(){
+        window.enterTransition = Slide().setDuration(400)
+        window.exitTransition = Slide().setDuration(400)
     }
 
 }

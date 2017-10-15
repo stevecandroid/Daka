@@ -9,8 +9,9 @@ import com.xt.daka.network.NetworkCallback
  */
 interface LoginContract{
 
-    interface View : BaseView<Presenter> , NetworkCallback{
-
+    interface View : BaseView<Presenter> {
+        fun onLoginSuccess();
+        fun onLoginFailed(error: LoginError);
     }
 
     interface Presenter: BasePresenter{

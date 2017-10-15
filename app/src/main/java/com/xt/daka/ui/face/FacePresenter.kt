@@ -1,10 +1,8 @@
 package com.xt.daka.ui.face
 
-import android.util.Log
 import com.xt.daka.network.exception.ApiException
 import com.xt.daka.network.youtu.Youtu
 import com.xt.daka.network.youtu.data.model.HttpStatus
-import com.xt.daka.util.toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
