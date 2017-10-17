@@ -10,7 +10,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient{
 
 
-    val youtuClient = youtuRetrofit()
+    val youtuClient : Retrofit by lazy {
+        youtuRetrofit()
+    }
+
+    val faceClient : Retrofit by lazy {
+        faceClient()
+    }
 
     private fun youtuRetrofit() : Retrofit{
         return  retrofit2.Retrofit.Builder().baseUrl("http://api.youtu.qq.com/")
@@ -18,5 +24,15 @@ object RetrofitClient{
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
     }
+
+    private fun faceClient() : Retrofit {
+        return  retrofit2.Retrofit.Builder().baseUrl("http://10.21.71.107:8080/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
+    }
+
+
+
 
 }

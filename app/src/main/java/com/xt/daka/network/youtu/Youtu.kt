@@ -1,5 +1,6 @@
 package com.xt.daka.network.youtu
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.data.xt.daka.constant.Constant
 import com.data.xt.daka.util.pic.bitmap.BitmapUtil
@@ -33,22 +34,36 @@ class Youtu {
             val body = CompareBody(byteBitmap1, byteBitmap2)
             return RetrofitClient.youtuClient.create(YoutuApi::class.java)
                     .compare(createYoutuSign(), body)
-
         }
 
-        fun compareWithoutCompress(path1:String,path2:String) : Observable<Response<CompareResult>> {
+        fun compareBase64( path:String, base64 : String) : Observable<Response<CompareResult>>{
 
-            val bitmap1 = BitmapFactory.decodeFile(path1)
-            val bitmap2 = BitmapFactory.decodeFile(path2)
+            val bitmap = BitmapUtil.getOptimalBitmap(path)
+            val base64Bitmap = BitmapUtil.bitmapToBase64(bitmap)
 
-            val byteBitmap1 = BitmapUtil.bitmapToBase64(bitmap1)
-            val byteBitmap2 = BitmapUtil.bitmapToBase64(bitmap2)
-
-            val body = CompareBody(byteBitmap1, byteBitmap2)
             return RetrofitClient.youtuClient.create(YoutuApi::class.java)
-                    .compare(createYoutuSign(), body)
-
+                    .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))
         }
+
+        fun compareBase64( bm : Bitmap , base64 : String): Observable<Response<CompareResult>>{
+            val base64Bitmap = BitmapUtil.bitmapToBase64(bm)
+            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
+                    .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))
+        }
+
+//        fun compareWithoutCompress(path1:String,path2:String) : Observable<Response<CompareResult>> {
+//
+//            val bitmap1 = BitmapFactory.decodeFile(path1)
+//            val bitmap2 = BitmapFactory.decodeFile(path2)
+//
+//            val byteBitmap1 = BitmapUtil.bitmapToBase64(bitmap1)
+//            val byteBitmap2 = BitmapUtil.bitmapToBase64(bitmap2)
+//
+//            val body = CompareBody(byteBitmap1, byteBitmap2)
+//            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
+//                    .compare(createYoutuSign(), body)
+//
+//        }
     }
 
 

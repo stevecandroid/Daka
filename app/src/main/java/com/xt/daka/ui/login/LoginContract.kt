@@ -1,8 +1,7 @@
-package com.xt.daka.ui.main
+package com.xt.daka.ui.login
 
 import com.xt.daka.base.BasePresenter
 import com.xt.daka.base.BaseView
-import com.xt.daka.network.NetworkCallback
 
 /**
  * Created by steve on 17-9-23.
@@ -10,8 +9,10 @@ import com.xt.daka.network.NetworkCallback
 interface LoginContract{
 
     interface View : BaseView<Presenter> {
-        fun onLoginSuccess();
-        fun onLoginFailed(error: LoginError);
+
+        fun onLoginSuccess()
+        fun onLoginFailed(error: LoginError)
+        fun onStartLogin()
     }
 
     interface Presenter: BasePresenter{

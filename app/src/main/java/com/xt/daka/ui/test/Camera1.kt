@@ -70,14 +70,14 @@ class Camera1 : UtilActivity() {
         setContentView(R.layout.activity_camera1)
 
         camera.onFaceDetected{
-            bm ,faces -> run{
-            val file = File(Environment.getExternalStorageDirectory().path + "/result.jpg")
-            bm.writeTo(file)
+            bm  -> run{
+//            val file = File(Environment.getExternalStorageDirectory().path + "/result.jpg")
+//            bm.writeTo(file)
 
-            var path : String
-                Youtu.compareWithoutCompress(file.path,file.path).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).subscribe {
-                    next -> Log.e("Camera1",next.body().similarity.toString())
-                }
+//            var path : String
+//                Youtu.compareWithoutCompress(file.path,file.path).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).subscribe {
+//                    next -> Log.e("Camera1",next.body().similarity.toString())
+//                }
 
             
 

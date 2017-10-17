@@ -36,9 +36,9 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="w3G0NEEM27bGul1r1v9ZrdHYiOnZT8UN" />
+            android:value="rwO99hVhP0CugostaLYx2wucwKhTRKcm" />
 
-        <activity android:name=".ui.face.FaceActivity"></activity>
+        <activity android:name=".ui.face.FaceActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -51,29 +51,27 @@
         </provider>
 
         <activity
-            android:name=".ui.main.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login"
             android:parentActivityName=".base.BaseActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.xt.daka.base.BaseActivity" />
-        </activity>
-        <activity android:name=".ui.main.MainActivity"></activity>
 
-
-
-        <service
-            android:name="com.baidu.location.f"
-            android:enabled="true"
-            android:process=":remote"></service>
-
-        <activity android:name=".ui.test.Camera1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.sign.SignActivity" />
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" />
+
+        <activity android:name=".ui.setting.SettingActivity"></activity>
     </application>
 
 </manifest>

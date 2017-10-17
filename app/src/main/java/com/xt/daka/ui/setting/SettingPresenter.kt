@@ -1,17 +1,9 @@
-package com.xt.daka.ui.main
+package com.xt.daka.ui.setting
 
 /**
- * Created by steve on 17-9-23.
+ * Created by steve on 17-10-16.
  */
-class LoginPresenter(val view : LoginContract.View) : LoginContract.Presenter{
-
-
-    override fun login(account: String, password: String) {
-
-        view.onLoginSuccess();
-
-    }
-
+class SettingPresenter : SettingContract.Presenter{
 
     override fun subscribe() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -20,7 +12,5 @@ class LoginPresenter(val view : LoginContract.View) : LoginContract.Presenter{
     override fun unsubscribe() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-
 
 }

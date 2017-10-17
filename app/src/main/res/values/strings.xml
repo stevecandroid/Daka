@@ -14,4 +14,12 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="info">INFO</string>
+    <string name="back">BACK</string>
+    <string name="reLocate">重新定位</string>
+    <string name="locating">locating…</string>
+    <string name="changephoto">请联系管理员更换图片</string>
+    <string name="located_failed">定位失败</string>
+    <string name="network_error">网络异常,请检查网络连接</string>
+    <string name="photo_fuzzy">照片模糊,请重新拍摄</string>
 </resources>

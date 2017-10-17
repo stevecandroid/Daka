@@ -1,4 +1,4 @@
-package com.xt.daka.ui.main
+package com.xt.daka.ui.login
 
 import com.xt.daka.base.BaseError
 
@@ -9,5 +9,6 @@ class LoginError( override var code: Int) : BaseError() {
     companion object {
         val ACCOUNT_INCORRECT = 0;
         val PASSWORD_INCORRECT = 1;
+        val CONNECT_TIMEOUT = 2;
     }
 }
