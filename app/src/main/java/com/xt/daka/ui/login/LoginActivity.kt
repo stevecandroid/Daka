@@ -19,7 +19,11 @@ import com.xt.daka.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_login.*
 import android.transition.Slide
 import com.xt.daka.ui.sign.SignActivity
+import com.xt.daka.ui.sign.SignException
 import com.xt.daka.util.helper.toast
+import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.customView
 
@@ -43,7 +47,6 @@ class LoginActivity : BaseActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
         initListener()
         initAnimation()
-
     }
 
     override fun onDestroy() {
@@ -60,11 +63,13 @@ class LoginActivity : BaseActivity(), LoginContract.View {
         startActivity(Intent(this@LoginActivity, SignActivity::class.java), bundle)
     }
 
-    override fun onLoginFailed(error: LoginError) {
-        when (error.code) {
-            LoginError.ACCOUNT_INCORRECT -> toast("账户不存在")
-            LoginError.PASSWORD_INCORRECT -> toast("密码错误,请重新输入")
-            LoginError.CONNECT_TIMEOUT -> toast("连接超时")
+    override fun onLoginFailed(error: Throwable) {
+        if(error is LoginException) {
+            when (error.status) {
+                LoginError.ACCOUNT_INCORRECT -> toast("账户不存在")
+                LoginError.PASSWORD_INCORRECT -> toast("密码错误,请重新输入")
+                LoginError.CONNECT_TIMEOUT -> toast("连接超时")
+            }
         }
         dialog?.dismiss()
     }

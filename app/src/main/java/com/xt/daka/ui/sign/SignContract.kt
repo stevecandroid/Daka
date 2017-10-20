@@ -11,11 +11,11 @@ import com.xt.daka.base.BaseView
 interface SignContract {
 
     interface View : BaseView<Presenter>{
-        fun onSignError(errorcode : Int)
+        fun onLocatedError()
         fun onLocated(location : String)
         fun onSignStart()
         fun onSignSuccess( similarity : Float)
-        fun onSignFail(errorcode : Int , failflag : Int)
+        fun onSignError( error : Throwable)
     }
 
     interface Presenter : BasePresenter{

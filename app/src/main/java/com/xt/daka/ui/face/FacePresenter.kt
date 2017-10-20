@@ -21,19 +21,19 @@ class FacePresenter(val view: FaceContract.View) : FaceContract.Presenter {
 
             result ->
 
-            val status = HttpStatus(result.code(), result.message())
-
-            if (!status.isAccessable()) {
-                view.identifyFailed(ApiException(status))
-                unsubscribe()
-            }
-
-            result.body()
+//            val status = HttpStatus(result.code(), result.message())
+//
+//            if (!status.isAccessable()) {
+//                view.identifyFailed(ApiException(status))
+//                unsubscribe()
+//            }
+//
+//            result.body()
 
         }.subscribe(
 
-                { result -> if(result.errorCode==0) view.identifySuccess(result) else view.identifyFailed(Exception("正脸请对准镜头"))},
-                { view.identifyFailed( Exception("请检查网络链接")) }
+//                { result -> if(result.errorCode==0) view.identifySuccess(result) else view.identifyFailed(Exception("正脸请对准镜头"))},
+//                { view.identifyFailed( Exception("请检查网络链接")) }
         )
 
         mDisposable.add(dispose)

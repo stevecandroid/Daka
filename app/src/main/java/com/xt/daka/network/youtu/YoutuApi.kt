@@ -18,7 +18,7 @@ interface YoutuApi{
 
     @POST("youtu/api/facecompare")
     @Headers("Host:api.youtu.qq.com","Content-Type:text/json")
-    fun compare(@Header("Authorization") authorization : String , @Body body : CompareBody) : Observable<Response<CompareResult>>
+    fun compare(@Header("Authorization") authorization : String , @Body body : CompareBody) : Observable<CompareResult>
 
 }
 

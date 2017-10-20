@@ -12,8 +12,7 @@ class App : Application() {
 
     companion object {
         lateinit var app : App
-        var user : User? = null
-        val testMode = true
+        val testMode = false
     }
 
     override fun onCreate() {

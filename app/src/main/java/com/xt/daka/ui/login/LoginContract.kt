@@ -11,7 +11,7 @@ interface LoginContract{
     interface View : BaseView<Presenter> {
 
         fun onLoginSuccess()
-        fun onLoginFailed(error: LoginError)
+        fun onLoginFailed(error: Throwable)
         fun onStartLogin()
     }
 

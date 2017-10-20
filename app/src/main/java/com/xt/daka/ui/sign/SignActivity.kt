@@ -2,22 +2,17 @@ package com.xt.daka.ui.sign
 
 import android.app.ProgressDialog
 import android.os.Bundle
-import android.os.Environment
 import android.transition.Slide
 import com.xt.daka.R
 import com.xt.daka.base.BaseActivity
 import com.xt.daka.util.helper.toast
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.util.Log
-import android.view.Gravity.LEFT
-import android.view.Gravity.TOP
+import android.view.Gravity.*
 import android.view.View
-import android.widget.EdgeEffect
 import kotlinx.android.synthetic.main.activity_sign.*
 import org.jetbrains.anko.indeterminateProgressDialog
 
@@ -39,12 +34,8 @@ class SignActivity : BaseActivity(), SignContract.View {
         location.text = loca
     }
 
-    override fun onSignError(errorcode: Int) {
-        when (errorcode) {
-            SignError.FLY_MODE_ERROR, SignError.NETWORK_ERROR -> {
-                toast(getString(R.string.network_error)); location.text = getString(R.string.located_failed)
-            }
-        }
+    override fun onLocatedError() {
+        toast(getString(R.string.network_error)); location.text = getString(R.string.located_failed)
     }
 
     override fun onSignSuccess(similarity: Float) {
@@ -53,23 +44,23 @@ class SignActivity : BaseActivity(), SignContract.View {
         resetStatus()
     }
 
-    override fun onSignFail(errorcode: Int, failflag: Int) {
-        when (failflag) {
-            SignError.FACE_LOCAL_PHOTO_ERROR -> toast(getString(R.string.photo_fuzzy))
-            SignError.FACE_REMOTE_PHOTO_ERROR -> toast(getString(R.string.changephoto))
+    override fun onSignError(error: Throwable) {
+        if(error is SignException){
+
         }
+        toast(error.message?:"未知异常")
         dialog?.dismiss()
         resetStatus()
     }
 
-    fun resetStatus(){
+    fun resetStatus() {
         camera.visibility = View.INVISIBLE
-        clockView.clockmode=true
+        clockView.clockmode = true
     }
 
 
     override fun onSignStart() {
-        dialog = indeterminateProgressDialog(resources.getString(R.string.locating))
+        dialog = indeterminateProgressDialog(resources.getString(R.string.signing))
     }
 
 
@@ -110,7 +101,7 @@ class SignActivity : BaseActivity(), SignContract.View {
     }
 
     fun initAnimation() {
-        window.enterTransition = Slide(TOP).setDuration(300)
+        window.enterTransition = Slide(START).setDuration(300)
 //        window.exitTransition = Slide().setDuration(400)
     }
 

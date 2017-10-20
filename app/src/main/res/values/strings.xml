@@ -17,7 +17,8 @@
     <string name="info">INFO</string>
     <string name="back">BACK</string>
     <string name="reLocate">重新定位</string>
-    <string name="locating">locating…</string>
+    <string name="locating">定位中…</string>
+    <string name="signing">签到中…</string>
     <string name="changephoto">请联系管理员更换图片</string>
     <string name="located_failed">定位失败</string>
     <string name="network_error">网络异常,请检查网络连接</string>

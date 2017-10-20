@@ -23,7 +23,7 @@ class Youtu {
             return mySign.toString()
         }
 
-        fun compare(path1: String, path2: String) : Observable<Response<CompareResult>> {
+        fun compare(path1: String, path2: String) : Observable<CompareResult> {
 
             val bitmap1 = BitmapUtil.getOptimalBitmap(path1)
             val bitmap2 = BitmapUtil.getOptimalBitmap(path2)
@@ -36,7 +36,7 @@ class Youtu {
                     .compare(createYoutuSign(), body)
         }
 
-        fun compareBase64( path:String, base64 : String) : Observable<Response<CompareResult>>{
+        fun compareBase64( path:String, base64 : String) : Observable<CompareResult>{
 
             val bitmap = BitmapUtil.getOptimalBitmap(path)
             val base64Bitmap = BitmapUtil.bitmapToBase64(bitmap)
@@ -45,7 +45,7 @@ class Youtu {
                     .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))
         }
 
-        fun compareBase64( bm : Bitmap , base64 : String): Observable<Response<CompareResult>>{
+        fun compareBase64( bm : Bitmap , base64 : String): Observable<CompareResult>{
             val base64Bitmap = BitmapUtil.bitmapToBase64(bm)
             return RetrofitClient.youtuClient.create(YoutuApi::class.java)
                     .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))

@@ -5,4 +5,5 @@ package com.xt.daka.base
  */
 abstract class BaseError{
     abstract var code : Int
+    abstract var errorMsg : String
 }
