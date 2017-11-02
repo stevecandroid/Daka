@@ -7,7 +7,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import com.data.xt.daka.UtilActivity
-import com.xt.daka.util.permission.PermissionsWrapper
+import com.xt.java3.util.pic.PermissionsWrapper
 import java.io.File
 
 /**

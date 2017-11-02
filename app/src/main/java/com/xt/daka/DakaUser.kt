@@ -1,6 +1,7 @@
 package com.xt.daka
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.xt.daka.data.model.request.ParamsFaceAcquire
 import com.xt.daka.data.model.request.ParamsLogin
 import com.xt.daka.data.model.response.User
@@ -10,6 +11,7 @@ import com.xt.daka.network.youtu.Youtu
 import com.xt.daka.network.youtu.data.model.CompareResult
 import com.xt.daka.ui.login.LoginException
 import com.xt.daka.ui.sign.SignException
+import com.xt.daka.util.helper.toast
 import io.reactivex.Observable
 
 /**
@@ -17,7 +19,7 @@ import io.reactivex.Observable
  */
 object DakaUser {
 
-    var user: User? = null
+    var user: User.UserDetial? = null
 
     fun login(account: String, password: String) =
             RetrofitClient.faceClient.create(FaceApi::class.java)
@@ -29,28 +31,28 @@ object DakaUser {
                         if(user.status != 3){
                             throw LoginException(user.status)
                         }else{
-                            DakaUser.user = user
+                            DakaUser.user = user.user
                         }
                     }
 
-    fun signin(bm: Bitmap) =
+    fun signin(bm: Bitmap)  =
             RetrofitClient.faceClient.create(FaceApi::class.java)
-                    .getface(ParamsFaceAcquire(user!!.user.name))
-                    .map { body ->
-                        body.body()
-                    }
+                    .getface(ParamsFaceAcquire(user!!.username))
                     .flatMap { mapper ->
-                        if (mapper.status == 1)
-                            Youtu.compareBase64(bm, mapper.imageStringData).doOnNext {
-                                result ->
-                                if(result.errorCode != 0 ){
+                        if (mapper.status == 1) {
+                            Youtu.compareBase64(bm, mapper.imageStringData).doOnNext { result ->
+
+                                if (result.errorCode != 0) {
                                     throw SignException(result.flag, result.errorMsg)
                                 }
                             }
+                        }
                         else {
+
                             Observable.create<CompareResult> { emitter ->
                                 emitter.onError(SignException(-1,"无法找到人脸,请联系管理员"))
                             }
+
                         }
 
                     }

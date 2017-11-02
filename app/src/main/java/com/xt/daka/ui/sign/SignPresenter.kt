@@ -1,6 +1,7 @@
 package com.xt.daka.ui.sign
 
 import android.graphics.Bitmap
+import android.os.Environment
 import com.baidu.location.BDAbstractLocationListener
 import com.baidu.location.BDLocation
 import com.baidu.location.LocationClient
@@ -12,9 +13,15 @@ import com.xt.daka.data.source.remote.api.FaceApi
 import com.xt.daka.network.RetrofitClient
 import com.xt.daka.network.youtu.Youtu
 import com.xt.daka.network.youtu.data.model.CompareResult
+import com.xt.daka.ui.login.LoginException
+import com.xt.daka.util.helper.toast
+import com.xt.daka.util.io.writeTo
 import io.reactivex.Observable
 import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.Android
 
 /**
  * Created by steve on 17-10-15.
@@ -78,48 +85,8 @@ class SignPresenter(val view: SignContract.View) : SignContract.Presenter {
 
     override fun faceCompare(bm: Bitmap) {
 
-//        if (App.testMode) {
-//            val bm2 = BitmapUtil.getOptimalBitmap(Environment.getExternalStorageDirectory().path + "/abc.jpg")
-//            val base64 = BitmapUtil.bitmapToBase64(bm2)
-//            Youtu.compareBase64(bm, base64).subscribeOn(Schedulers.newThread())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(object : Observer<CompareResult> {
-//
-//                        override fun onError(e: Throwable?) {
-//                            view.onSignError(LocatedError(LocatedError.ERROR_UNKNOW,LocatedError.FACE_NETWORK_ERROR,"网络出错"))
-//                        }
-//
-//                        override fun onComplete() {
-//
-//                        }
-//
-//                        override fun onNext(result: CompareResult?) {
-//
-//                            if (result != null) {
-//
-//                                Log.e("SignPresenter",result.errorCode.toString())
-//
-//                                when(result.errorCode){
-//                                    0 -> view.onSignSuccess(result.similarity)
-//
-//                                    LocatedError.FACE_REMOTE_POHOTO_NOT_EXIST ->
-//                                        view.onSignError(LocatedError(LocatedError.FACE_REMOTE_POHOTO_NOT_EXIST,result.flag,result.errorMsg))
-//
-//                                    else ->  view.onSignError(LocatedError(LocatedError.ERROR_UNKNOW,result.flag,result.errorMsg))
-//                                }
-//                            } else {
-//                                view.onSignError(LocatedError(LocatedError.ERROR_UNKNOW,-500,"返回体空"))
-//                            }
-//                        }
-//
-//                        override fun onSubscribe(d: Disposable?) {
-//                            view.onSignStart()
-//                        }
-//                    })
-//
-//        }
-
-         DakaUser.signin(bm).subscribe(object : Observer<CompareResult> {
+         DakaUser.signin(bm).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(object : Observer<CompareResult> {
 
                 override fun onError(e: Throwable?) {
                     view.onSignError(e!!)
@@ -130,10 +97,12 @@ class SignPresenter(val view: SignContract.View) : SignContract.Presenter {
 
                 override fun onNext(result: CompareResult?) {
                     view.onSignSuccess(result!!.similarity)
+
                 }
 
                 override fun onSubscribe(d: Disposable?) {
                     view.onSignStart()
+
                 }
 
             })

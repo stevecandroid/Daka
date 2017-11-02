@@ -33,8 +33,12 @@ class TextureCamera : TextureView , TextureView.SurfaceTextureListener,Camera.Pr
         mCamera.release()
         Log.e("TextureCamera","DESTORY")
         return true
+
+
     
     }
+
+    var supportFaceDetecte = false
 
     override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
 
@@ -49,15 +53,20 @@ class TextureCamera : TextureView , TextureView.SurfaceTextureListener,Camera.Pr
         val radio : Float  = width.toFloat()/supportWith
         setMeasuredDimension(width,(supportHeight*radio).toInt())
         layout(0, (-(supportHeight*radio)/5).toInt(),width, ((supportHeight*radio).toInt()-(supportHeight*radio)/5).toInt())
-        
+
+
+        if(mCamera.parameters.maxNumDetectedFaces > 0 ) supportFaceDetecte = true
+
         mCamera.setPreviewCallback(this)
 
         mCamera.setPreviewTexture(surfaceTexture)
 
+        if(supportFaceDetecte)
         mCamera.setFaceDetectionListener(this)
 
         mCamera.startPreview();
 
+        if(supportFaceDetecte)
         mCamera.startFaceDetection()
 
     }
@@ -118,6 +127,10 @@ class TextureCamera : TextureView , TextureView.SurfaceTextureListener,Camera.Pr
     var hasTake = false
     private var allowTake = false
     override fun onFaceDetection(faces: Array<out Camera.Face>?, camera: Camera?) {
+        takePhotoAnyWay()
+    }
+
+    fun takePhotoAnyWay(){
         if(!hasTake) {
             allowTake = true
         }

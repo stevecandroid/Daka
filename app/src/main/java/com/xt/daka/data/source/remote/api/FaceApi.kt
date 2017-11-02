@@ -24,7 +24,7 @@ interface FaceApi {
 
     @Headers("Accept:application/json" , "Content-Type:application/json")
     @POST("FaceRecognize/duty/picture/match")
-    fun getface(@Body params : ParamsFaceAcquire) : Observable<Response<Face>>
+    fun getface(@Body params : ParamsFaceAcquire) : Observable<Face>
 
     @POST("FaceRecognize/user/recordduty")
     @Headers("Accept:application/json" , "Content-Type:application/json")

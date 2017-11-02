@@ -9,8 +9,9 @@ import android.annotation.TargetApi
 import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
-import com.xt.daka.util.permission.PermissionsWrapper.PermissionMgr
+
 import com.data.xt.daka.UtilActivity
+import com.xt.java3.util.pic.PermissionsWrapper
 
 
 /**
@@ -33,7 +34,7 @@ class AlbumPicker private constructor(private var act: UtilActivity) {
 
 
     fun selectedPicAndHandle(handler: (String?) -> Unit) {
-        PermissionMgr.with(act).setupDefaultConfig().request {
+        PermissionsWrapper.PermissionMgr.with(act).setupDefaultConfig().request {
             permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             onAllSuccess {
                 val intent = Intent("android.intent.action.GET_CONTENT")

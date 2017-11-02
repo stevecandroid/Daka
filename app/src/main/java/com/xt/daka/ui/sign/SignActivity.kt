@@ -11,8 +11,11 @@ import java.util.*
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.util.Log
 import android.view.Gravity.*
 import android.view.View
+import android.widget.Toast
+import com.xt.daka.DakaUser
 import kotlinx.android.synthetic.main.activity_sign.*
 import org.jetbrains.anko.indeterminateProgressDialog
 
@@ -28,6 +31,8 @@ class SignActivity : BaseActivity(), SignContract.View {
         mPresenter = SignPresenter(this)
         mPresenter.subscribe()
         init()
+        
+        Log.e("SignActivity",DakaUser.user!!.name)
     }
 
     override fun onLocated(loca: String) {
@@ -35,7 +40,7 @@ class SignActivity : BaseActivity(), SignContract.View {
     }
 
     override fun onLocatedError() {
-        toast(getString(R.string.network_error)); location.text = getString(R.string.located_failed)
+//        toast(getString(R.string.network_error)); location.text = getString(R.string.located_failed)
     }
 
     override fun onSignSuccess(similarity: Float) {
@@ -45,10 +50,12 @@ class SignActivity : BaseActivity(), SignContract.View {
     }
 
     override fun onSignError(error: Throwable) {
-        if(error is SignException){
-
-        }
-        toast(error.message?:"未知异常")
+        toast(error.toString())
+//        if(error is SignException){
+//            Toast.makeText(this,"status" + error.status.toString(),Toast.LENGTH_LONG).show()
+//        }else {
+//            Toast.makeText(this,error.message ?: "未知异常",Toast.LENGTH_LONG).show()
+//        }
         dialog?.dismiss()
         resetStatus()
     }
@@ -84,9 +91,10 @@ class SignActivity : BaseActivity(), SignContract.View {
             mPresenter.startLocation()
         }
 
+        camera.onFaceDetected { rawBit -> process(rawBit) }
+
         clockView.setOnClickListener {
 
-            camera.onFaceDetected { rawBit -> process(rawBit) }
             if (camera.visibility == View.INVISIBLE) {
                 camera.visibility = View.VISIBLE
                 camera.hasTake = false
@@ -95,6 +103,10 @@ class SignActivity : BaseActivity(), SignContract.View {
             }
 
             clockView.clockmode = !clockView.clockmode
+        }
+
+        take.setOnClickListener {
+            camera.takePhotoAnyWay()
         }
 
 

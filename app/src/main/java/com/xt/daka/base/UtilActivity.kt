@@ -3,9 +3,10 @@ package com.data.xt.daka
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import com.xt.daka.util.permission.PermissionsWrapper
+
 import com.xt.daka.util.pic.AlbumPicker
 import com.xt.daka.util.pic.PhotoTaker
+import com.xt.java3.util.pic.PermissionsWrapper
 
 
 /**

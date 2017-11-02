@@ -47,6 +47,10 @@ class LoginActivity : BaseActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
         initListener()
         initAnimation()
+
+        password.setText("1")
+        account.setText("1")
+
     }
 
     override fun onDestroy() {
@@ -68,8 +72,9 @@ class LoginActivity : BaseActivity(), LoginContract.View {
             when (error.status) {
                 LoginError.ACCOUNT_INCORRECT -> toast("账户不存在")
                 LoginError.PASSWORD_INCORRECT -> toast("密码错误,请重新输入")
-                LoginError.CONNECT_TIMEOUT -> toast("连接超时")
             }
+        }else{
+            toast("连接超时")
         }
         dialog?.dismiss()
     }
