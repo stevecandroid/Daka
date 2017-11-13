@@ -5,4 +5,4 @@ import java.util.*
 /**
  * Created by steve on 17-10-18.
  */
-data class ParamsSign(val username : String , val time : Date )
+data class ParamsSign(val username : String )

@@ -14,14 +14,16 @@ interface SignContract {
         fun onLocatedError()
         fun onLocated(location : String)
         fun onSignStart()
-        fun onSignSuccess( similarity : Float)
+        fun onSignSuccess()
         fun onSignError( error : Throwable)
+        fun getFace(bitmap: Bitmap)
     }
 
     interface Presenter : BasePresenter{
         fun startLocation()
         fun stopLocation()
-        fun faceCompare( bm : Bitmap )
+        fun signIn( bm : Bitmap )
+        fun getFace()
     }
 
 }

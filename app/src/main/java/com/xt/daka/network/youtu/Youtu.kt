@@ -23,30 +23,31 @@ class Youtu {
             return mySign.toString()
         }
 
-        fun compare(path1: String, path2: String) : Observable<CompareResult> {
-
-            val bitmap1 = BitmapUtil.getOptimalBitmap(path1)
-            val bitmap2 = BitmapUtil.getOptimalBitmap(path2)
-
-            val byteBitmap1 = BitmapUtil.bitmapToBase64(bitmap1)
-            val byteBitmap2 = BitmapUtil.bitmapToBase64(bitmap2)
-
-            val body = CompareBody(byteBitmap1, byteBitmap2)
-            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
-                    .compare(createYoutuSign(), body)
-        }
-
-        fun compareBase64( path:String, base64 : String) : Observable<CompareResult>{
-
-            val bitmap = BitmapUtil.getOptimalBitmap(path)
-            val base64Bitmap = BitmapUtil.bitmapToBase64(bitmap)
-
-            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
-                    .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))
-        }
+//        fun compare(path1: String, path2: String) : Observable<CompareResult> {
+//
+//            val bitmap1 = BitmapUtil.getOptimalBitmap(path1)
+//            val bitmap2 = BitmapUtil.getOptimalBitmap(path2)
+//
+//            val byteBitmap1 = BitmapUtil.bitmapToBase64(bitmap1)
+//            val byteBitmap2 = BitmapUtil.bitmapToBase64(bitmap2)
+//
+//            val body = CompareBody(byteBitmap1, byteBitmap2)
+//            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
+//                    .compare(createYoutuSign(), body)
+//        }
+//
+//        fun compareBase64( path:String, base64 : String) : Observable<CompareResult>{
+//
+//            val bitmap = BitmapUtil.getOptimalBitmap(path)
+//            val base64Bitmap = BitmapUtil.bitmapToBase64(bitmap)
+//
+//            return RetrofitClient.youtuClient.create(YoutuApi::class.java)
+//                    .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))
+//        }
 
         fun compareBase64( bm : Bitmap , base64 : String): Observable<CompareResult>{
-            val base64Bitmap = BitmapUtil.bitmapToBase64(bm)
+            val optimalBitmap = BitmapUtil.compressByQuality(bm,(1024*1024*1.5).toLong())
+            val base64Bitmap = BitmapUtil.bitmapToBase64(optimalBitmap)
             return RetrofitClient.youtuClient.create(YoutuApi::class.java)
                     .compare(createYoutuSign(),CompareBody(base64Bitmap,base64))
         }
@@ -66,30 +67,4 @@ class Youtu {
 //        }
     }
 
-
-
-
-
-//    fun compare(path1: ByteArray?, path2: ByteArray?) {
-//        val byteBitmap1 = BitmapUtil.bitmapToBase64(ImageUtils.compressByScale(BitmapFactory.decodeByteArray(path2,0,0),500,500))
-//        val byteBitmap2 = BitmapUtil.bitmapToBase64(ImageUtils.compressByScale(BitmapFactory.decodeByteArray(path1,0,0),500,500))
-//        val body = CompareBody(byteBitmap1, byteBitmap2)
-//        Retro.Retrofit.create(YoutuApi::class.java).compare(createYoutuSign(), body).subscribe(
-//                { t: ResponseBody? -> Log.e("Test", t!!.string()) },
-//                {error-> error.printStackTrace()},
-//                {Log.e("Youtu","Complete")},
-//                {}
-//        )
-//    }
-
-//    fun compare(path1: ByteArray?, path2: String?) {
-//        val byteBitmap1 = BitmapUtil.bitmapToBase64(ImageUtils.compressByScale(BitmapFactory.decodeByteArray(path1,0,0),500,500))
-//        val byteBitmap2 = BitmapUtil.bitmapToBase64(ImageUtils.compressByScale(BitmapFactory.decodeFile(path2),500,500))
-//        val body = CompareBody(byteBitmap1, byteBitmap2)
-//        Retro.Retrofit.create(YoutuApi::class.java).compare(createYoutuSign(), body).subscribe(
-//                { t: ResponseBody? -> Log.e("Test", t!!.string()) },
-//                {error-> error.printStackTrace()},
-//                {Log.e("Youtu","Complete")}
-//        )
-//    }
 }

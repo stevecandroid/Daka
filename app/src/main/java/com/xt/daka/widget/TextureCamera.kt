@@ -115,9 +115,7 @@ class TextureCamera : TextureView , TextureView.SurfaceTextureListener,Camera.Pr
             val out = ByteArrayOutputStream()
             yuv.compressToJpeg(Rect(0, 0, width, height), 50, out)
             val bytes = out.toByteArray()
-            val b = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             detected?.invoke(bytes)
-         
 
         }
 

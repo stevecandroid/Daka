@@ -2,13 +2,20 @@ package com.xt.daka.ui.sign
 
 import android.graphics.Bitmap
 import android.os.Environment
+import android.util.Log
 import com.baidu.location.BDAbstractLocationListener
 import com.baidu.location.BDLocation
 import com.baidu.location.LocationClient
 import com.baidu.location.LocationClientOption
+import com.data.xt.daka.util.pic.bitmap.BitmapUtil
+import com.data.xt.daka.util.pic.bitmap.toRound
 import com.xt.daka.App
 import com.xt.daka.DakaUser
 import com.xt.daka.data.model.request.ParamsFaceAcquire
+import com.xt.daka.data.model.request.ParamsSign
+import com.xt.daka.data.model.response.BaseResponse
+import com.xt.daka.data.model.response.Face
+import com.xt.daka.data.model.response.YourSuperResponse
 import com.xt.daka.data.source.remote.api.FaceApi
 import com.xt.daka.network.RetrofitClient
 import com.xt.daka.network.youtu.Youtu
@@ -27,6 +34,7 @@ import org.jetbrains.anko.Android
  * Created by steve on 17-10-15.
  */
 class SignPresenter(val view: SignContract.View) : SignContract.Presenter {
+
 
 
     private val mLocationClient: LocationClient by lazy {
@@ -83,10 +91,38 @@ class SignPresenter(val view: SignContract.View) : SignContract.Presenter {
             mLocationClient.start()
     }
 
-    override fun faceCompare(bm: Bitmap) {
+    override fun getFace() {
+        DakaUser.getFace().subscribe(object : Observer<Face>{
+            override fun onNext(value: Face?) {
 
-         DakaUser.signin(bm).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(object : Observer<CompareResult> {
+                if(value!= null)
+                    view.getFace(BitmapUtil.base64ToBitmap(value.imageStringData))
+
+            }
+
+            override fun onSubscribe(d: Disposable?) {
+            }
+
+            override fun onComplete() {
+            }
+
+            override fun onError(e: Throwable?) {
+            }
+
+        })
+    }
+
+    override fun signIn(bm: Bitmap) {
+
+         DakaUser.signin(bm).flatMap {
+             mapper ->
+             if(mapper.similarity < DakaUser.MIN_SIMILARITY) throw SignException(SignException.SIMILARITY_TOO_SMALL,"人物不相似")
+
+             RetrofitClient.faceClient.create(FaceApi::class.java).sign(ParamsSign(DakaUser.user!!.username))
+         }
+
+                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(object : Observer<YourSuperResponse> {
 
                 override fun onError(e: Throwable?) {
                     view.onSignError(e!!)
@@ -95,14 +131,16 @@ class SignPresenter(val view: SignContract.View) : SignContract.Presenter {
                 override fun onComplete() {
                 }
 
-                override fun onNext(result: CompareResult?) {
-                    view.onSignSuccess(result!!.similarity)
+                override fun onNext(result: YourSuperResponse) {
+
+                    Log.e("SignPresenter",result?.toString());
+
+                        view.onSignSuccess()
 
                 }
 
                 override fun onSubscribe(d: Disposable?) {
                     view.onSignStart()
-
                 }
 
             })

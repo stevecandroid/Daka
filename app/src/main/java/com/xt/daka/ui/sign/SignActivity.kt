@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.Gravity.*
 import android.view.View
 import android.widget.Toast
+import com.blankj.utilcode.util.ImageUtils
 import com.xt.daka.DakaUser
 import kotlinx.android.synthetic.main.activity_sign.*
 import org.jetbrains.anko.indeterminateProgressDialog
@@ -31,8 +32,7 @@ class SignActivity : BaseActivity(), SignContract.View {
         mPresenter = SignPresenter(this)
         mPresenter.subscribe()
         init()
-        
-        Log.e("SignActivity",DakaUser.user!!.name)
+
     }
 
     override fun onLocated(loca: String) {
@@ -40,22 +40,25 @@ class SignActivity : BaseActivity(), SignContract.View {
     }
 
     override fun onLocatedError() {
-//        toast(getString(R.string.network_error)); location.text = getString(R.string.located_failed)
+        toast("定位失败")
     }
 
-    override fun onSignSuccess(similarity: Float) {
-        toast("相似度${similarity}")
+    override fun onSignSuccess() {
+        toast("签到成功")
         dialog?.dismiss()
         resetStatus()
     }
 
     override fun onSignError(error: Throwable) {
-        toast(error.toString())
-//        if(error is SignException){
-//            Toast.makeText(this,"status" + error.status.toString(),Toast.LENGTH_LONG).show()
-//        }else {
-//            Toast.makeText(this,error.message ?: "未知异常",Toast.LENGTH_LONG).show()
-//        }
+        if(error is SignException){
+            when(error.status){
+                SignException.LOCAL_PHOTO_ERROR -> toast("照片模糊,请重新拍摄")
+                SignException.REMOTE_PHOTO_ERROR -> toast("请联系管理员更换照片")
+                SignException.SIMILARITY_TOO_SMALL -> toast("请确认是同一个人")
+            }
+        }else{
+            toast(error.toString())
+        }
         dialog?.dismiss()
         resetStatus()
     }
@@ -67,7 +70,7 @@ class SignActivity : BaseActivity(), SignContract.View {
 
 
     override fun onSignStart() {
-        dialog = indeterminateProgressDialog(resources.getString(R.string.signing))
+        dialog = ProgressDialog.show(this,null,"签到中..",true)
     }
 
 
@@ -76,11 +79,15 @@ class SignActivity : BaseActivity(), SignContract.View {
         val mat = Matrix()
         mat.setRotate(-90F)
         val bm2 = Bitmap.createBitmap(bm, 0, 0, bm.width, bm.height, mat, true)
-        mPresenter.faceCompare(bm2)
+        mPresenter.signIn(bm2)
     }
 
     fun init() {
         initAnimation()
+
+        mPresenter.getFace()
+
+        name.text = DakaUser.user?.name
 
         val format = SimpleDateFormat("MM月dd号")
         date.text = format.format(Date())
@@ -109,8 +116,12 @@ class SignActivity : BaseActivity(), SignContract.View {
             camera.takePhotoAnyWay()
         }
 
-
     }
+
+    override fun getFace(bitmap: Bitmap) {
+        head.setImageBitmap(bitmap)
+    }
+
 
     fun initAnimation() {
         window.enterTransition = Slide(START).setDuration(300)

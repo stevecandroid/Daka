@@ -6,6 +6,7 @@ import com.xt.daka.data.model.request.ParamsSign
 import com.xt.daka.data.model.response.BaseResponse
 import com.xt.daka.data.model.response.Face
 import com.xt.daka.data.model.response.User
+import com.xt.daka.data.model.response.YourSuperResponse
 import io.reactivex.Observable
 import retrofit2.Response
 import retrofit2.http.Body
@@ -26,9 +27,10 @@ interface FaceApi {
     @POST("FaceRecognize/duty/picture/match")
     fun getface(@Body params : ParamsFaceAcquire) : Observable<Face>
 
-    @POST("FaceRecognize/user/recordduty")
+    @POST("FaceRecognize/duty/record")
     @Headers("Accept:application/json" , "Content-Type:application/json")
-    fun sign(@Body params : ParamsSign) : Observable<Response<BaseResponse>>
+    fun sign(@Body params : ParamsSign) : Observable<YourSuperResponse>
+
 
 
 }

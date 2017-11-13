@@ -21,10 +21,6 @@ class LoginPresenter(val view: LoginContract.View) : LoginContract.Presenter {
 
     override fun login(account: String, password: String) {
 
-        if(App.testMode){
-            view.onLoginSuccess()
-            return
-        }
 
        DakaUser.login(account, password)
                 .subscribeOn(Schedulers.newThread())

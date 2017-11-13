@@ -13,6 +13,9 @@ import com.xt.daka.ui.login.LoginException
 import com.xt.daka.ui.sign.SignException
 import com.xt.daka.util.helper.toast
 import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by steve on 17-10-20.
@@ -20,6 +23,8 @@ import io.reactivex.Observable
 object DakaUser {
 
     var user: User.UserDetial? = null
+
+    val MIN_SIMILARITY = 80
 
     fun login(account: String, password: String) =
             RetrofitClient.faceClient.create(FaceApi::class.java)
@@ -56,6 +61,11 @@ object DakaUser {
                         }
 
                     }
+    fun getFace() = RetrofitClient.faceClient.create(FaceApi::class.java)
+            .getface(ParamsFaceAcquire(user!!.username))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.newThread())
+
 
 
 }

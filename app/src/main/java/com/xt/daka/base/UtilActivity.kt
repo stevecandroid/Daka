@@ -1,7 +1,9 @@
 package com.data.xt.daka
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+
 import android.support.v7.app.AppCompatActivity
 
 import com.xt.daka.util.pic.AlbumPicker
@@ -16,12 +18,14 @@ import com.xt.java3.util.pic.PermissionsWrapper
 open class UtilActivity : AppCompatActivity() {
 
 
+
     var permissionMgr = PermissionsWrapper.PermissionMgr.with(this)
     var albumPicker = AlbumPicker.with(this)
     var photoTaker = PhotoTaker.with(this)
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         permissionMgr.onRequestPermissionsResult(requestCode,permissions,grantResults)
+
     }
 
 
